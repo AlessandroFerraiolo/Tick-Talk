@@ -8,8 +8,6 @@ Tick-Talk is a **language exchange platform** that introduces **time as a curren
 
 ### 📂 Additional Resources  
 - **📄 What is Tick-Talk** – The original vision and concept behind the project.  
-- **📄 Market Analysis & Business Plan** – Insights on industry trends and competitors.  
-- **📄 Pitch Deck** – A concise presentation of the project's goals and features.
 
 ### 🚀 Current Status & Future Plans  
 Since the hackathon, development has been on hold, and the platform remains in its early MVP stage. While there are no immediate plans to continue development, I hope to revisit the project in the future.  
