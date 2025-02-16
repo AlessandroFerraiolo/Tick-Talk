@@ -152,7 +152,7 @@ import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/1
 
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD_8XOF7AjD2HILY57ZGG52JzI6J1lVKS0",
+  apiKey: process.env.API_KEY,
   authDomain: "tick-talk-5b816.firebaseapp.com",
   projectId: "tick-talk-5b816",
   storageBucket: "tick-talk-5b816.firebasestorage.app",
