@@ -1,0 +1,279 @@
+header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 40px;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent scrolling */
+    width: 100%;
+    height: 100%;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    
+}
+
+
+.app-title {
+    font-size: 24px;
+}
+.header-balance {
+    font-size: 18px;
+}
+
+.page {
+    flex: 1;
+    display: none;
+    flex-direction: column; /* Stack content vertically */
+    justify-content: flex-start; /* Align content at the top */
+    align-items: center;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow effect */
+    padding: 20px;
+    box-sizing: border-box; /* Ensure padding is included in the total dimensions */
+    height: 100%; /* Full viewport height */
+    overflow: hidden; /* Prevent content overflow */
+}
+.page.active {
+    display: flex;
+  }
+
+.bottom-nav {
+    position: fixed; /* Fix it to the bottom of the screen */
+    bottom: 0; /* Align it to the bottom */
+    left: 0;
+    width: 100%; /* Full width */
+    display: flex; /* Align buttons in a row */
+    justify-content: space-around;
+    align-items: center;
+    background-color: #007bff;
+    border-top: 1px solid #ccc; /* Subtle border at the top */
+    height: 60px;
+    z-index: 1000; /* Keep it above other content */
+}
+
+.nav-item {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.nav-item.active {
+    color: #ffc107;
+}
+
+
+.btn {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+
+}
+/* Profile Page Specific Styling */
+.profile-page {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    background-color: #ffffff; /* White background for better readability */
+    border-radius: 10px; /* Rounded corners */
+    max-width: 600px;
+    margin-bottom: 80px  ; 
+    margin: auto;
+}
+
+/* Profile Page Title Styling */
+.profile-page h1 {
+    font-size: 2.5rem;
+    color: #007aff; /* Blue accent for the title */
+    margin-bottom: 20px;
+}
+
+/* Form Labels */
+.profile-page label {
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+    color: #333; /* Neutral text color */
+}
+
+/* Input and Select Styling */
+.profile-page select,
+.profile-page input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    background-color: #f9f9f9; /* Light background for inputs */
+}
+
+/* Checkboxes Section */
+.profile-checkboxes {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+    display: block;
+
+}
+
+.profile-checkboxes label {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.profile-checkboxes input[type="checkbox"] {
+    margin-right: 10px;
+    accent-color: #007aff; /* Styled checkbox color */
+}
+
+/* Save Button Styling */
+.profile-page button {
+    padding: 10px 20px;
+    background-color: #007aff;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.profile-page button:hover {
+    background-color: #005bb5; /* Darker blue for hover effect */
+}
+
+/* CHAT */
+.chat-message {
+    display: flex;
+    margin-bottom: 10px;
+    position: relative;
+}
+.chat-message .chat-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+.chat-message .message-content {
+    background-color: #e9ecef;
+    border-radius: 8px;
+    padding: 10px;
+    max-width: 70%;
+}
+.chat-message .message-time {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+.chat-preview {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.chat-details {
+    margin-left: 10px;
+}
+.chat-message .chat-avatar-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.5);
+    z-index: -1;
+}
+
+
+
+/* VIDEO CALL */
+video {
+    width: 100%; /* Set to 100% for responsiveness */
+    height: 100%; /* Set to 100% for responsiveness */
+    background: black; /* Background color for video */
+    margin: 10px; /* Space around video */
+}
+
+.video-container {
+    display: flex;
+    justify-content: center; /* Centers boxes horizontally */
+    margin-bottom: 20px; /* Adds some space below the video boxes */
+}
+
+.video-box {
+    width: 250px; /* Increased width of video box */
+    height: 200px; /* Height of video box */
+    background-color: #333; /* Dark gray background */
+    border-radius: 8px; /* Slightly rounded corners */
+    margin: 10px; /* Space around video box */
+    display: flex; /* Flexbox for layout */
+    flex-direction: column; /* Aligns name vertically */
+    align-items: center; /* Centers name horizontally */
+    justify-content: flex-start; /* Aligns name at the top */
+    color: white; /* Text color white */
+    position: relative; /* For positioning */
+    overflow: hidden; /* Ensures content does not overflow */
+}
+
+.user-name {
+    margin: 10px 0; /* Space above and below names */
+    font-size: 1.2em; /* Font size for user name */
+    text-align: center; /* Center align text */
+}
+
+.call-controls {
+    margin: 20px 0; /* Space above and below controls */
+}
+
+.btn {
+    padding: 10px 20px; /* Button padding */
+    margin: 5px; /* Space around buttons */
+    font-size: 16px; /* Font size for buttons */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s; /* Transition effect */
+}
+
+.btn-primary {
+    background-color: #007bff; /* Primary button color */
+    color: #fff; /* Text color */
+}
+
+.btn-danger {
+    background-color: #dc3545; /* Danger button color */
+    color: #fff; /* Text color */
+}
+
+.btn:hover {
+    opacity: 0.9; /* Slightly fade on hover */
+}
