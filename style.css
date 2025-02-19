@@ -1,20 +1,165 @@
-header{
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 40px;
+:root {
+    --primary-color: #4F46E5;
+    --primary-hover: #4338CA;
+    --text-primary: #111827;
+    --text-secondary: #6B7280;
+    --bg-primary: #F9FAFB;
+    --bg-secondary: #FFFFFF;
+    --border-color: #E5E7EB;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 body, html {
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Prevent scrolling */
-    width: 100%;
-    height: 100%;
-    font-family: 'Roboto', sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.5;
 }
+
+header {
+    background-color: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.main-container {
+    max-width: 1000px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.auth-section {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.auth-section h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 1.125rem;
+    margin-bottom: 2rem;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.select-styled {
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background-color: var(--bg-secondary);
+    font-size: 1rem;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.select-styled:hover {
+    border-color: var(--primary-color);
+}
+
+.topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.topic-card {
+    position: relative;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.5rem;
+    background-color: var(--bg-secondary);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.topic-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.topic-card input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+}
+
+.topic-card input[type="checkbox"]:checked + i {
+    color: var(--primary-color);
+}
+
+.topic-card i {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary);
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-outline {
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    color: var(--text-secondary);
+}
+
+.btn-large {
+    padding: 1rem 2rem;
+    font-size: 1.125rem;
+}
+
+.call-section {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Existing video call styles remain the same */
 
 #app {
     display: flex;
@@ -24,7 +169,6 @@ body, html {
     overflow: hidden;
     
 }
-
 
 .app-title {
     font-size: 24px;
@@ -52,17 +196,7 @@ body, html {
   }
 
 .bottom-nav {
-    position: fixed; /* Fix it to the bottom of the screen */
-    bottom: 0; /* Align it to the bottom */
-    left: 0;
-    width: 100%; /* Full width */
-    display: flex; /* Align buttons in a row */
-    justify-content: space-around;
-    align-items: center;
-    background-color: #007bff;
-    border-top: 1px solid #ccc; /* Subtle border at the top */
-    height: 60px;
-    z-index: 1000; /* Keep it above other content */
+    display: none;
 }
 
 .nav-item {
@@ -76,7 +210,6 @@ body, html {
 .nav-item.active {
     color: #ffc107;
 }
-
 
 .btn {
     padding: 10px 15px;
@@ -213,8 +346,6 @@ body, html {
     z-index: -1;
 }
 
-
-
 /* VIDEO CALL */
 video {
     width: 100%; /* Set to 100% for responsiveness */
@@ -276,4 +407,50 @@ video {
 
 .btn:hover {
     opacity: 0.9; /* Slightly fade on hover */
+}
+
+.user-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#userDisplay {
+    font-size: 14px;
+    color: #666;
+}
+
+#signOutButton {
+    padding: 5px 10px;
+    font-size: 14px;
+}
+
+.main-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.profile-section {
+    margin-bottom: 20px;
+}
+
+#startCallButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.role-section {
+    max-width: 400px;
+    margin: 2rem auto;
+    text-align: center;
+}
+
+.role-section label {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: block;
 }
