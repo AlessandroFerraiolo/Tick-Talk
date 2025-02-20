@@ -1,8 +1,8 @@
 # 🕒 Tick-Talk  
 
 > **Disclaimer:** This project was developed during my **first hackathon** with **no prior experience** as a full-stack developer. As a result, the final product is far from the original vision outlined in the document **"What is Tick-Talk"**.  
-> After the hackathon, I **paused development**, so the web app remains in its **MVP (Minimum Viable Product) stage**.
-> The Firebase project API key expired, therefore the login function will not work, however I've just disabled the condition to be logged in order to test the call
+> After the hackathon, I **paused development**, so the web app remains in its **MVP (Minimum Viable Product) stage**.  \n
+> The Firebase project's API key has expired, so the login function isn't working. I've temporarily bypassed the login requirement to test the call.
 
 ### 📌 About the Project  
 Tick-Talk is a **language exchange platform** that introduces **time as a currency**, allowing users to **earn time by teaching their native language and spend it to practice a target language**. The original concept envisioned AI-powered translations, smart matchmaking, and gamification to enhance the learning experience. However, the current version is just a **basic prototype**.
