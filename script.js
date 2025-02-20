@@ -1,10 +1,6 @@
-console.log("Script loaded!");
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import { getAuth, signOut, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
 import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
-
-console.log("Firebase modules imported");
 
 const firebaseConfig = {
     apiKey: process.env.API_KEY,
@@ -17,7 +13,6 @@ const firebaseConfig = {
     databaseURL: "https://tick-talk-5b816-default-rtdb.europe-west1.firebasedatabase.app/"
 };
 
-console.log("Config loaded:", firebaseConfig);
 
 // AUTHENTICATION
 const firebaseApp = initializeApp(firebaseConfig);
@@ -25,9 +20,7 @@ const auth = getAuth(firebaseApp);
 auth.languageCode = "it";
 const provider = new GoogleAuthProvider();
 
-console.log("Firebase initialized");
 
-// Make sure we wait for the DOM to be fully loaded
 document.addEventListener('DOMContentLoaded', () => {
     console.log("DOM loaded");
     
