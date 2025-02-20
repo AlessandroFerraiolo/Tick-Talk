@@ -1,7 +1,7 @@
 # 🕒 Tick-Talk  
 
 > **Disclaimer:** This project was developed during my **first hackathon** with **no prior experience** as a full-stack developer. As a result, the final product is far from the original vision outlined in the document **"What is Tick-Talk"**.  
-> After the hackathon, I **paused development**, so the web app remains in its **MVP (Minimum Viable Product) stage**.  \n
+> After the hackathon, I **paused development**, so the web app remains in its **MVP (Minimum Viable Product) stage**.  
 > The Firebase project's API key has expired, so the login function isn't working. I've temporarily bypassed the login requirement to test the call.
 
 ### 📌 About the Project  
