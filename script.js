@@ -7,7 +7,7 @@ import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/1
 console.log("Firebase modules imported");
 
 const firebaseConfig = {
-    apiKey: "AIzaSyA5hMf9pYkDIQtZvuyR-BhKwPA_i5nE0C4",
+    apiKey: process.env.FIREBASE_API_KEY,
     authDomain: "tick-talk-5b816.firebaseapp.com",
     projectId: "tick-talk-5b816",
     storageBucket: "tick-talk-5b816.firebasestorage.app",
