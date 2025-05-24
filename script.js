@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import { getAuth, signOut, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyA5hMf9pYkDIQtZvuyR-BhKwPA_i5nE0C4",
@@ -205,7 +205,9 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log("User logged in:", user);
             userDisplay.innerText = `Logged in as: ${user.email}`;
             await callManager.fetchTimeBalance(user);
-            await prefillForm(user);
+            await prefillForm(user); // Make sure prefillForm populates the user's own profile first
+
+            // The temporary call to findPotentialMatches has been removed from here.
         } else {
             console.log("No user logged in.");
             userDisplay.innerText = "Not logged in";
@@ -246,6 +248,8 @@ const prefillForm = async (user) => {
             // Populate form fields with retrieved data
             form.nativeLanguage.value = data.nativeLanguage || '';
             form.targetLanguage.value = data.targetLanguage || '';
+            form.targetProficiency.value = data.proficiencyTarget || 'beginner';
+            form.userBio.value = data.bio || '';
 
             // Check the relevant checkboxes for topics
             if (data.topics && Array.isArray(data.topics)) {
@@ -256,9 +260,14 @@ const prefillForm = async (user) => {
         } else {
             console.log("No profile data found for user, initializing.");
             // Initialize profile and ensure timeBalance is also initialized if not present
-            const initialData = { 
-                profile: { nativeLanguage: '', targetLanguage: '', topics: [] }
+            const initialProfile = { 
+                nativeLanguage: '', 
+                targetLanguage: '', 
+                topics: [], 
+                proficiencyTarget: 'beginner', 
+                bio: '' 
             };
+            const initialData = { profile: initialProfile };
             if (!docSnap.exists() || (docSnap.exists() && docSnap.data().timeBalance === undefined)) {
                 initialData.timeBalance = 0;
             }
@@ -266,6 +275,8 @@ const prefillForm = async (user) => {
             // Clear form fields if initializing
             form.nativeLanguage.value = '';
             form.targetLanguage.value = '';
+            form.targetProficiency.value = 'beginner';
+            form.userBio.value = '';
             form.querySelectorAll('input[name="topics"]').forEach((checkbox) => {
                 checkbox.checked = false;
             });
@@ -280,6 +291,8 @@ const saveProfileData = async (user) => {
     const userDocRef = doc(db, "users", user.uid);
     const nativeLanguageValue = form.nativeLanguage.value;
     const targetLanguageValue = form.targetLanguage.value;
+    const targetProficiencyValue = form.targetProficiency.value;
+    const userBioValue = form.userBio.value;
     const selectedTopics = [];
     form.querySelectorAll('input[name="topics"]:checked').forEach((checkbox) => {
         selectedTopics.push(checkbox.value);
@@ -289,6 +302,8 @@ const saveProfileData = async (user) => {
         nativeLanguage: nativeLanguageValue,
         targetLanguage: targetLanguageValue,
         topics: selectedTopics,
+        proficiencyTarget: targetProficiencyValue,
+        bio: userBioValue,
     };
 
     try {
@@ -308,6 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const elementsToListen = [
             form.nativeLanguage,
             form.targetLanguage,
+            form.targetProficiency,
+            form.userBio,
             ...form.querySelectorAll('input[name="topics"]'),
         ];
 
@@ -321,6 +338,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
+
+        // "Find Matches" Button Functionality
+        const findMatchesButton = document.getElementById('findMatchesButton');
+        if (findMatchesButton) {
+            findMatchesButton.addEventListener('click', async () => {
+                const user = auth.currentUser;
+                const container = document.getElementById('matchesContainer');
+                if (user) {
+                    const userDocSnap = await getDoc(doc(db, "users", user.uid));
+                    if (userDocSnap.exists() && userDocSnap.data().profile) {
+                        await findPotentialMatches(userDocSnap.data().profile);
+                    } else {
+                        console.log("Please complete your profile first.");
+                        if(container) container.innerHTML = "<p>Please complete your profile to find matches.</p>";
+                    }
+                } else {
+                    console.log("Please log in to find matches.");
+                    if(container) container.innerHTML = "<p>Please log in to find matches.</p>";
+                }
+            });
+        } else {
+            console.error("Find Matches button not found.");
+        }
+
     } else {
         console.error("Form not found for attaching profile save listeners.");
     }
@@ -345,5 +386,80 @@ signOutButton.addEventListener("click", () => {
         console.error("Sign out error:", error);
     });
 });
+
+// Function to find potential matches
+const findPotentialMatches = async (currentUserProfile) => {
+    console.log("Current user profile for matching:", currentUserProfile);
+
+    if (!currentUserProfile || !currentUserProfile.nativeLanguage || !currentUserProfile.targetLanguage) {
+        console.log("Current user profile with native/target languages not available for matching.");
+        return []; // Return an empty array or handle appropriately
+    }
+
+    const usersRef = collection(db, "users");
+    const q = query(usersRef,
+                    where("profile.nativeLanguage", "==", currentUserProfile.targetLanguage),
+                    where("profile.targetLanguage", "==", currentUserProfile.nativeLanguage)
+                  );
+
+    const matchedProfiles = [];
+    try {
+        const querySnapshot = await getDocs(q);
+        querySnapshot.forEach((doc) => {
+            // Filter out the current user from the matches.
+            if (doc.id === auth.currentUser.uid) {
+                return; // continue to next iteration
+            }
+            const userData = doc.data();
+            if (userData.profile) { // Ensure profile exists
+                // console.log("Potential match:", doc.id, userData.profile); // Logging moved to displayMatches or can be kept for debug
+                matchedProfiles.push({ id: doc.id, profile: userData.profile });
+            }
+        });
+    } catch (error) {
+        console.error("Error finding potential matches:", error);
+        // This is where the Firestore index error would typically be caught.
+        // The user will see this error in the console with a link to create the index.
+    }
+    displayMatches(matchedProfiles); // Call displayMatches with the results
+    return matchedProfiles;
+};
+
+// Function to display matches in the UI
+const displayMatches = (matchesArray) => {
+    const container = document.getElementById('matchesContainer');
+    if (!container) {
+        console.error("Matches container not found.");
+        return;
+    }
+    container.innerHTML = ''; // Clear previous matches
+
+    if (!matchesArray || matchesArray.length === 0) {
+        container.innerHTML = '<p>No matches found. Try adjusting your profile languages!</p>';
+        return;
+    }
+
+    matchesArray.forEach(match => {
+        const card = document.createElement('div');
+        card.className = 'match-card';
+
+        // Basic details
+        let displayName = match.profile.displayName || match.id; // Use displayName if available, else ID
+        let nativeLang = match.profile.nativeLanguage || 'N/A';
+        let targetLang = match.profile.targetLanguage || 'N/A';
+        let proficiencyTarget = match.profile.proficiencyTarget || 'N/A';
+        let bio = match.profile.bio || 'N/A';
+
+        card.innerHTML = `
+            <h4>${displayName}</h4>
+            <p><strong>Speaks:</strong> ${nativeLang}</p>
+            <p><strong>Wants to Learn:</strong> ${targetLang} (Their Level: ${proficiencyTarget})</p>
+            <p><strong>Bio:</strong> ${bio}</p>
+        `;
+        // TODO: Add a "Start Chat" or "View Profile" button here later
+        container.appendChild(card);
+        console.log("Displaying match:", match);
+    });
+};
 
 
