@@ -1,21 +1,20 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
 import { getAuth, signOut, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-database.js";
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: process.env.API_KEY,
-    authDomain: "tick-talk-5b816.firebaseapp.com",
-    projectId: "tick-talk-5b816",
-    storageBucket: "tick-talk-5b816.firebasestorage.app",
-    messagingSenderId: "659050213776",
-    appId: "1:659050213776:web:a788adefa211b7b4f98315",
-    measurementId: "G-03DZGPVMKW",
-    databaseURL: "https://tick-talk-5b816-default-rtdb.europe-west1.firebasedatabase.app/"
+    apiKey: "AIzaSyA5hMf9pYkDIQtZvuyR-BhKwPA_i5nE0C4",
+    authDomain: "tick-talk-373da.firebaseapp.com",
+    projectId: "tick-talk-373da",
+    storageBucket: "tick-talk-373da.firebasestorage.app",
+    messagingSenderId: "351794687800",
+    appId: "1:351794687800:web:162c371d694b75c0721bcd"
 };
 
 
 // AUTHENTICATION
 const firebaseApp = initializeApp(firebaseConfig);
+const db = getFirestore(firebaseApp);
 const auth = getAuth(firebaseApp);
 auth.languageCode = "it";
 const provider = new GoogleAuthProvider();
@@ -91,14 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const user = auth.currentUser;
             if (user) {
                 try {
-                    await set(ref(database, `users/${user.uid}/timeBalance`), this.timeBalance);
+                    // await set(ref(database, `users/${user.uid}/timeBalance`), this.timeBalance);
+                    await setDoc(doc(db, "users", user.uid), { timeBalance: this.timeBalance }, { merge: true });
                     
                     // Store transaction history
-                    const transactionRef = ref(database, `users/${user.uid}/transactions/${Date.now()}`);
-                    await set(transactionRef, {
+                    // const transactionRef = ref(database, `users/${user.uid}/transactions/${Date.now()}`);
+                    // await set(transactionRef, {
+                    await addDoc(collection(db, "users", user.uid, "transactions"), {
                         role: role,
                         duration: callDuration,
-                        timestamp: now.toISOString(),
+                        timestamp: serverTimestamp(), // Use serverTimestamp for consistency
                         balanceAfter: this.timeBalance
                     });
                 } catch (error) {
@@ -141,17 +142,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Fetch the time balance from Firebase on login
         async fetchTimeBalance(user) {
-            const timeBalanceRef = ref(database, `users/${user.uid}/timeBalance`);
+            // const timeBalanceRef = ref(database, `users/${user.uid}/timeBalance`);
+            const userDocRef = doc(db, "users", user.uid);
             try {
-                const snapshot = await get(timeBalanceRef);
-                if (snapshot.exists()) {
+                // const snapshot = await get(timeBalanceRef);
+                const docSnap = await getDoc(userDocRef);
+                // if (snapshot.exists()) {
+                if (docSnap.exists()) {
                     // Set the time balance in callManager
-                    this.timeBalance = snapshot.val();
+                    // this.timeBalance = snapshot.val();
+                    this.timeBalance = docSnap.data().timeBalance;
                     this.elements.timeBalanceDisplay.textContent = this.writeTime(this.timeBalance);
                     console.log("Time balance fetched from Firebase:", this.timeBalance);
                 } else {
                     console.log("No time balance found for user, setting to 0.");
                     this.timeBalance = 0; // Default value if no time balance is found
+                     // Initialize timeBalance in Firestore if it doesn't exist
+                    await setDoc(userDocRef, { timeBalance: 0 }, { merge: true });
                     this.elements.timeBalanceDisplay.textContent = this.writeTime(this.timeBalance);
                 }
             } catch (error) {
@@ -227,14 +234,14 @@ const form = document.getElementById('profileForm');
 
 // Function to pre-fill the form with data from Firebase Realtime Database
 const prefillForm = async (user) => {
-    const userRef = ref(database, `users/${user.uid}/profile`);
+    const userDocRef = doc(db, "users", user.uid);
 
     try {
-        const snapshot = await get(userRef);
+        const docSnap = await getDoc(userDocRef);
 
-        if (snapshot.exists()) {
-            const data = snapshot.val();
-            console.log("Fetched data:", data);
+        if (docSnap.exists() && docSnap.data().profile) {
+            const data = docSnap.data().profile;
+            console.log("Fetched profile data:", data);
 
             // Populate form fields with retrieved data
             form.nativeLanguage.value = data.nativeLanguage || '';
@@ -242,17 +249,83 @@ const prefillForm = async (user) => {
 
             // Check the relevant checkboxes for topics
             if (data.topics && Array.isArray(data.topics)) {
-                form.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+                form.querySelectorAll('input[name="topics"]').forEach((checkbox) => {
                     checkbox.checked = data.topics.includes(checkbox.value);
                 });
             }
         } else {
-            console.log("No data found for user.");
+            console.log("No profile data found for user, initializing.");
+            // Initialize profile and ensure timeBalance is also initialized if not present
+            const initialData = { 
+                profile: { nativeLanguage: '', targetLanguage: '', topics: [] }
+            };
+            if (!docSnap.exists() || (docSnap.exists() && docSnap.data().timeBalance === undefined)) {
+                initialData.timeBalance = 0;
+            }
+            await setDoc(userDocRef, initialData, { merge: true });
+            // Clear form fields if initializing
+            form.nativeLanguage.value = '';
+            form.targetLanguage.value = '';
+            form.querySelectorAll('input[name="topics"]').forEach((checkbox) => {
+                checkbox.checked = false;
+            });
         }
     } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching or initializing profile data:", error);
     }
 };
+
+// Function to save profile data to Firestore
+const saveProfileData = async (user) => {
+    const userDocRef = doc(db, "users", user.uid);
+    const nativeLanguageValue = form.nativeLanguage.value;
+    const targetLanguageValue = form.targetLanguage.value;
+    const selectedTopics = [];
+    form.querySelectorAll('input[name="topics"]:checked').forEach((checkbox) => {
+        selectedTopics.push(checkbox.value);
+    });
+
+    const profileData = {
+        nativeLanguage: nativeLanguageValue,
+        targetLanguage: targetLanguageValue,
+        topics: selectedTopics,
+    };
+
+    try {
+        await setDoc(userDocRef, { profile: profileData }, { merge: true });
+        console.log("Profile data saved:", profileData);
+    } catch (error) {
+        console.error("Error saving profile data:", error);
+    }
+};
+
+// Attach event listeners for profile saving
+document.addEventListener('DOMContentLoaded', () => {
+    // Ensure this runs after the main DOMContentLoaded where 'form' is defined.
+    // If 'form' is defined in the same DOMContentLoaded, this is fine.
+    // Otherwise, ensure 'form' is accessible here.
+    if (form) { // Check if form is already defined
+        const elementsToListen = [
+            form.nativeLanguage,
+            form.targetLanguage,
+            ...form.querySelectorAll('input[name="topics"]'),
+        ];
+
+        elementsToListen.forEach((element) => {
+            if (element) { // Check if element exists
+                element.addEventListener('change', () => {
+                    const user = auth.currentUser;
+                    if (user) {
+                        saveProfileData(user);
+                    }
+                });
+            }
+        });
+    } else {
+        console.error("Form not found for attaching profile save listeners.");
+    }
+});
+
 
 const signOutButton = document.getElementById("signOutButton");
 const userDisplay = document.getElementById("userDisplay");
@@ -263,6 +336,11 @@ signOutButton.addEventListener("click", () => {
         signOutButton.style.display = "none";
         callManager.timeBalance = 0;
         callManager.elements.timeBalanceDisplay.textContent = callManager.writeTime(0);
+        // Optionally, clear form fields on sign out
+        if (form) {
+            form.reset(); // Resets all form fields to their initial values
+            form.querySelectorAll('input[name="topics"]').forEach(checkbox => checkbox.checked = false); // Ensure checkboxes are cleared
+        }
     }).catch((error) => {
         console.error("Sign out error:", error);
     });
