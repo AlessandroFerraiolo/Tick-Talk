@@ -58,6 +58,20 @@
                             <option value="ge">German</option>
                         </select>
                     </div>
+
+                    <div class="form-section">
+                        <label for="targetProficiency">My Target Language Level</label>
+                        <select id="targetProficiency" name="targetProficiency" class="select-styled">
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <label for="userBio">About Me (Bio)</label>
+                    <textarea id="userBio" name="userBio" class="textarea-styled" rows="4" placeholder="Tell us a little about yourself and what you like to talk about..."></textarea>
                 </div>
 
                 <div class="topics-section">
@@ -128,5 +142,50 @@
         </div>
     </div>
     <script type="module" src="script.js"></script>
+
+    <div class="matches-section">
+        <h2>Potential Language Partners</h2>
+        <button id="findMatchesButton" class="btn btn-secondary">Find Matches</button>
+        <div id="matchesContainer" class="matches-container">
+            <!-- Matches will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <style>
+        .matches-section { 
+            margin-top: 2rem; 
+            padding-top: 1rem; 
+            border-top: 1px solid var(--border-color, #ddd); /* Added fallback for border-color */
+            text-align: center; 
+        }
+        .matches-container { 
+            margin-top: 1rem; 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 1rem; 
+        }
+        .match-card { 
+            padding: 1rem; 
+            border: 1px solid var(--border-color, #ddd); /* Added fallback for border-color */
+            border-radius: 0.5rem; 
+            background-color: var(--bg-secondary, #f9f9f9); /* Added fallback for bg-secondary */
+            text-align: left; 
+        }
+        .match-card h4 { 
+            margin-top: 0; 
+            margin-bottom: 0.5rem; 
+            color: var(--primary-color, #007bff); /* Added fallback for primary-color */
+        }
+        .match-card p { 
+            margin-bottom: 0.25rem; 
+            font-size: 0.9rem; 
+        }
+        /* Ensuring variables are defined if not already in style.css (conceptual) */
+        :root {
+            --border-color: #ddd;
+            --bg-secondary: #f9f9f9;
+            --primary-color: #007bff;
+        }
+    </style>
 </body>
 </html>
